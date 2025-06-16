@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<panel title="Styled Contact Form" width="450" height="400">
+    <vlayout id="main_layout" padding="16" gap="12" align="stretch">
+        <!-- Header with styling -->
+        <label id="header" text="📝 Contact Information" 
+               font-size="large" 
+               text-color="blue" 
+               align-self="center" 
+               margin="8" />
+        
+        <!-- Name row with custom styling -->
+        <hlayout id="name_row" align="center" gap="10" margin="4">
+            <label id="name_label" 
+                   text="Name:" 
+                   width="80" 
+                   font-size="default" 
+                   text-color="default" />
+            <input id="name_input" 
+                   bind="name" 
+                   flex="1" 
+                   variant="default" />
+        </hlayout>
+        
+        <!-- Email row -->
+        <hlayout id="email_row" align="center" gap="10" margin="4">
+            <label id="email_label" 
+                   text="Email:" 
+                   width="80" />
+            <input id="email_input" 
+                   bind="email" 
+                   flex="1" />
+        </hlayout>
+        
+        <!-- Languages section with styling -->
+        <vlayout id="languages_section" 
+                  gap="6" 
+                  padding="12" 
+                  margin="8">
+            <label id="languages_label" 
+                   text="Programming Languages:" 
+                   font-size="default" 
+                   text-color="green" 
+                   bold="true" />
+            <checkbox id="python_check" 
+                      text="🐍 Python" 
+                      bind="python" />
+            <checkbox id="swift_check" 
+                      text="🦄 Swift" 
+                      bind="swift" />
+            <checkbox id="cpp_check" 
+                      text="⚡ C++" 
+                      bind="cpp" />
+        </vlayout>
+        
+        <!-- Buttons with different variants -->
+        <hlayout id="buttons_row" 
+                  justify="space-evenly" 
+                  gap="12" 
+                  margin="8">
+            <button id="ok_button" 
+                    text="✅ Save Contact" 
+                    flex="1" 
+                    variant="primary" />
+            <button id="cancel_button" 
+                    text="❌ Cancel" 
+                    flex="1" 
+                    variant="danger" />
+        </hlayout>
+        
+        <!-- Footer with small text -->
+        <label id="footer" 
+               text="All fields are optional" 
+               font-size="small" 
+               text-color="gray" 
+               align-self="center" 
+               margin="4" />
+    </vlayout>
+</panel>

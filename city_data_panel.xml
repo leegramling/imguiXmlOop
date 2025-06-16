@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<panel title="City Data Grid" width="900" height="600">
+    <vlayout id="main_layout" padding="10" gap="15">
+        <!-- Header row -->
+        <hlayout id="header_row" justify="space-between" align="center" gap="10">
+            <label id="header_city" text="City" flex="2" font-size="large" bold="true"/>
+            <label id="header_lat" text="Latitude" flex="1" font-size="large" bold="true"/>
+            <label id="header_lon" text="Longitude" flex="1" font-size="large" bold="true"/>
+            <label id="header_elev" text="Elevation (m)" flex="1" font-size="large" bold="true"/>
+            <label id="header_temp" text="Avg Temp (°C)" flex="1" font-size="large" bold="true"/>
+            <label id="header_climate" text="Climate" flex="1" font-size="large" bold="true"/>
+        </hlayout>
+        
+        <!-- Data rows (6 rows x 5 cities each) -->
+        <!-- Row 1 -->
+        <hlayout id="row_0" justify="space-between" align="center" gap="10">
+            <input id="city_0" type="text" bind="city_name_0" flex="2"/>
+            <input id="lat_0" type="number" bind="city_lat_0" flex="1"/>
+            <input id="lon_0" type="number" bind="city_lon_0" flex="1"/>
+            <input id="elev_0" type="number" bind="city_elev_0" flex="1"/>
+            <input id="temp_0" type="number" bind="city_temp_0" flex="1"/>
+            <vlayout id="climate_0" flex="1" gap="2">
+                <radio id="radio_0_0" text="Temperate" group="climate_0" value="3" bind="city_climate_0"/>
+                <radio id="radio_0_1" text="Tropical" group="climate_0" value="1" bind="city_climate_0"/>
+                <radio id="radio_0_2" text="Arid" group="climate_0" value="2" bind="city_climate_0"/>
+            </vlayout>
+        </hlayout>
+        
+        <!-- Row 2 -->
+        <hlayout id="row_1" justify="space-between" align="center" gap="10">
+            <input id="city_1" type="text" bind="city_name_1" flex="2"/>
+            <input id="lat_1" type="number" bind="city_lat_1" flex="1"/>
+            <input id="lon_1" type="number" bind="city_lon_1" flex="1"/>
+            <input id="elev_1" type="number" bind="city_elev_1" flex="1"/>
+            <input id="temp_1" type="number" bind="city_temp_1" flex="1"/>
+            <vlayout id="climate_1" flex="1" gap="2">
+                <radio id="radio_1_0" text="Temperate" group="climate_1" value="3" bind="city_climate_1"/>
+                <radio id="radio_1_1" text="Tropical" group="climate_1" value="1" bind="city_climate_1"/>
+                <radio id="radio_1_2" text="Arid" group="climate_1" value="2" bind="city_climate_1"/>
+            </vlayout>
+        </hlayout>
+        
+        <!-- Row 3 -->
+        <hlayout id="row_2" justify="space-between" align="center" gap="10">
+            <input id="city_2" type="text" bind="city_name_2" flex="2"/>
+            <input id="lat_2" type="number" bind="city_lat_2" flex="1"/>
+            <input id="lon_2" type="number" bind="city_lon_2" flex="1"/>
+            <input id="elev_2" type="number" bind="city_elev_2" flex="1"/>
+            <input id="temp_2" type="number" bind="city_temp_2" flex="1"/>
+            <vlayout id="climate_2" flex="1" gap="2">
+                <radio id="radio_2_0" text="Temperate" group="climate_2" value="3" bind="city_climate_2"/>
+                <radio id="radio_2_1" text="Tropical" group="climate_2" value="1" bind="city_climate_2"/>
+                <radio id="radio_2_2" text="Arid" group="climate_2" value="2" bind="city_climate_2"/>
+            </vlayout>
+        </hlayout>
+        
+        <!-- Row 4 -->
+        <hlayout id="row_3" justify="space-between" align="center" gap="10">
+            <input id="city_3" type="text" bind="city_name_3" flex="2"/>
+            <input id="lat_3" type="number" bind="city_lat_3" flex="1"/>
+            <input id="lon_3" type="number" bind="city_lon_3" flex="1"/>
+            <input id="elev_3" type="number" bind="city_elev_3" flex="1"/>
+            <input id="temp_3" type="number" bind="city_temp_3" flex="1"/>
+            <vlayout id="climate_3" flex="1" gap="2">
+                <radio id="radio_3_0" text="Temperate" group="climate_3" value="3" bind="city_climate_3"/>
+                <radio id="radio_3_1" text="Tropical" group="climate_3" value="1" bind="city_climate_3"/>
+                <radio id="radio_3_2" text="Arid" group="climate_3" value="2" bind="city_climate_3"/>
+            </vlayout>
+        </hlayout>
+        
+        <!-- Row 5 -->
+        <hlayout id="row_4" justify="space-between" align="center" gap="10">
+            <input id="city_4" type="text" bind="city_name_4" flex="2"/>
+            <input id="lat_4" type="number" bind="city_lat_4" flex="1"/>
+            <input id="lon_4" type="number" bind="city_lon_4" flex="1"/>
+            <input id="elev_4" type="number" bind="city_elev_4" flex="1"/>
+            <input id="temp_4" type="number" bind="city_temp_4" flex="1"/>
+            <vlayout id="climate_4" flex="1" gap="2">
+                <radio id="radio_4_0" text="Temperate" group="climate_4" value="3" bind="city_climate_4"/>
+                <radio id="radio_4_1" text="Tropical" group="climate_4" value="1" bind="city_climate_4"/>
+                <radio id="radio_4_2" text="Arid" group="climate_4" value="2" bind="city_climate_4"/>
+            </vlayout>
+        </hlayout>
+        
+        <!-- Row 6 -->
+        <hlayout id="row_5" justify="space-between" align="center" gap="10">
+            <input id="city_5" type="text" bind="city_name_5" flex="2"/>
+            <input id="lat_5" type="number" bind="city_lat_5" flex="1"/>
+            <input id="lon_5" type="number" bind="city_lon_5" flex="1"/>
+            <input id="elev_5" type="number" bind="city_elev_5" flex="1"/>
+            <input id="temp_5" type="number" bind="city_temp_5" flex="1"/>
+            <vlayout id="climate_5" flex="1" gap="2">
+                <radio id="radio_5_0" text="Temperate" group="climate_5" value="3" bind="city_climate_5"/>
+                <radio id="radio_5_1" text="Tropical" group="climate_5" value="1" bind="city_climate_5"/>
+                <radio id="radio_5_2" text="Arid" group="climate_5" value="2" bind="city_climate_5"/>
+            </vlayout>
+        </hlayout>
+        
+        <!-- Action buttons -->
+        <hlayout id="button_row" justify="center" gap="15" margin="10">
+            <button id="save_cities" text="Save City Data" variant="primary"/>
+            <button id="reset_cities" text="Reset Data" variant="danger"/>
+        </hlayout>
+    </vlayout>
+</panel>
