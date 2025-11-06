@@ -7,7 +7,7 @@
 // ============================================================================
 
 Panel::Panel(const std::string& title, float width, float height)
-    : title_(title), width_(width), height_(height) {}
+    : title_(title), width_(width), height_(height), base_width_(width), base_height_(height) {}
 
 void Panel::render() {
     if (!is_open_) return;
@@ -36,6 +36,34 @@ void Panel::update_layout() {
     if (root_widget_) {
         root_widget_->update_layout(width_, height_);
     }
+}
+
+void Panel::set_width(float width) {
+    width_ = width;
+    if (dpi_scale_ > 0.0f) {
+        base_width_ = width / dpi_scale_;
+    } else {
+        base_width_ = width;
+    }
+}
+
+void Panel::set_height(float height) {
+    height_ = height;
+    if (dpi_scale_ > 0.0f) {
+        base_height_ = height / dpi_scale_;
+    } else {
+        base_height_ = height;
+    }
+}
+
+void Panel::set_dpi_scale(float scale) {
+    if (scale <= 0.0f) {
+        return;
+    }
+    dpi_scale_ = scale;
+    width_ = base_width_ * dpi_scale_;
+    height_ = base_height_ * dpi_scale_;
+    update_layout();
 }
 
 void Panel::set_root_widget(std::unique_ptr<Widget> root) {
@@ -129,5 +157,16 @@ void PanelManager::toggle_panel(const std::string& name) {
     Panel* panel = get_panel(name);
     if (panel) {
         panel->toggle();
+    }
+}
+
+void PanelManager::set_all_dpi_scale(float scale) {
+    if (scale <= 0.0f) {
+        return;
+    }
+    for (auto& [name, panel] : panels_) {
+        if (panel) {
+            panel->set_dpi_scale(scale);
+        }
     }
 }

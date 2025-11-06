@@ -32,16 +32,19 @@ public:
     void set_title(const std::string& title) { title_ = title; }
     
     float get_width() const { return width_; }
-    void set_width(float width) { width_ = width; }
+    void set_width(float width);
     
     float get_height() const { return height_; }
-    void set_height(float height) { height_ = height; }
+    void set_height(float height);
     
     bool is_open() const { return is_open_; }
     void set_open(bool open) { is_open_ = open; }
     void show() { is_open_ = true; }
     void hide() { is_open_ = false; }
     void toggle() { is_open_ = !is_open_; }
+
+    float get_dpi_scale() const { return dpi_scale_; }
+    void set_dpi_scale(float scale);
     
     // Widget management
     void set_root_widget(std::unique_ptr<Widget> root);
@@ -63,6 +66,9 @@ private:
     std::string title_;
     float width_;
     float height_;
+    float base_width_;
+    float base_height_;
+    float dpi_scale_ = 1.0f;
     bool is_open_ = true;
     std::unique_ptr<Widget> root_widget_;
     
@@ -96,6 +102,7 @@ public:
     void show_panel(const std::string& name);
     void hide_panel(const std::string& name);
     void toggle_panel(const std::string& name);
+    void set_all_dpi_scale(float scale);
     
     const std::map<std::string, std::unique_ptr<Panel>>& get_panels() const { return panels_; }
     

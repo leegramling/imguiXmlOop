@@ -1,6 +1,7 @@
 #pragma once
 #include "Widget.h"
 #include "Panel.h"
+#include "AppData.h"
 #include <string>
 #include <map>
 #include <functional>
@@ -8,38 +9,6 @@
 #include <ctime>
 #include <vector>
 #include <algorithm>
-
-// Forward declarations
-class AppData;
-
-/**
- * @brief Application data structure
- * 
- * Contains all the data that widgets can bind to. This follows the
- * Model-View-Controller pattern where this is the Model.
- */
-struct CityData {
-    std::string name;
-    float latitude;
-    float longitude;
-    int elevation; // meters above sea level
-    float avg_temp; // Celsius
-    int population;
-    int climate_zone = 0; // 0=Temperate, 1=Tropical, 2=Arid, 3=Continental
-};
-
-struct AppData {
-    std::string name;
-    std::string email;
-    bool python_selected = false;
-    bool go_selected = false;
-    bool swift_selected = false;
-    bool rust_selected = false;
-    bool cpp_selected = false;
-    
-    // City data for grid
-    std::vector<CityData> cities;
-};
 
 /**
  * @brief Strategy interface for handling different XML element types

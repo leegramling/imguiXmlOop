@@ -27,12 +27,16 @@ file(GLOB_RECURSE YOGA_SOURCES
 )
 list(FILTER YOGA_SOURCES EXCLUDE REGEX ".*test.*")
 
+set(CORE_SOURCES
+    Widget.cpp
+    Panel.cpp
+)
+
 # Create executable
 add_executable(imgui_oop_app
     main.cpp
-    Widget.cpp
-    Panel.cpp
     XmlParser.cpp
+    ${CORE_SOURCES}
     ${IMGUI_SOURCES}
     ${YOGA_SOURCES}
     ${TINYXML2_SOURCES}
@@ -54,3 +58,25 @@ target_link_libraries(imgui_oop_app
 
 # Compiler flags
 target_compile_options(imgui_oop_app PRIVATE ${SDL2_CFLAGS_OTHER})
+
+add_executable(imgui_builder
+    builder_main.cpp
+    CityDataPanelBuilder.cpp
+    ${CORE_SOURCES}
+    ${IMGUI_SOURCES}
+    ${YOGA_SOURCES}
+)
+
+target_include_directories(imgui_builder PRIVATE
+    ${IMGUI_DIR}
+    ${IMGUI_DIR}/backends
+    ${YOGA_DIR}
+    ${TINYXML2_DIR}
+    ${SDL2_INCLUDE_DIRS}
+)
+
+target_link_libraries(imgui_builder
+    ${SDL2_LIBRARIES}
+)
+
+target_compile_options(imgui_builder PRIVATE ${SDL2_CFLAGS_OTHER})

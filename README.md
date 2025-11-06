@@ -1,407 +1,57 @@
-# ImGui XML OOP - Object-Oriented UI Framework
+# ImGui Yoga Builder Guide
 
-This project demonstrates a comprehensive object-oriented approach to building XML-driven user interfaces with ImGui. It serves as a counterpart to the data-oriented `panelWidgets` project, showcasing how the same functionality can be implemented using different programming paradigms.
+## Overview
+- `imgui_builder` showcases a functor-driven builder pattern that creates the city data panel entirely in C++ without XML. Widgets are composed with fluent helpers in `UiBuilder.h`, enabling callbacks and Yoga settings to be wired inline.
+- `imgui_oop_app` keeps the original XML-driven workflow. The XML is parsed into widgets, callbacks are matched by id, and Yoga is still responsible for flex-style sizing.
+- Shared data, callbacks, and Yoga layout rules live in reusable components so both approaches behave consistently during resize, DPI changes, and hot reloads.
 
-## 🎯 Project Overview
+## Yoga Layout Overview
+- Yoga represents every widget as a node with flex properties (width, height, flex, gap, align, justify). We attach a Yoga node to each `Widget` and call `YGNodeCalculateLayout`.
+- The results feed ImGui rendering: after `Panel::render` queries the content region, the root widget recomputes layout so all inputs and labels pick up their measured size.
+- Because Yoga is declarative, swapping from XML to the builder pattern does not change how layout constraints are evaluated—the same Yoga nodes are reused.
 
-This framework implements a complete UI system using **Object-Oriented Programming (OOP)** principles with ImGui as the rendering backend. The system allows developers to define user interfaces in XML and have them automatically rendered with proper data binding, styling, and interaction handling.
-
-## 🏗️ Architecture & Design Patterns
-
-### Core Design Patterns Used
-
-#### 1. **Template Method Pattern**
-The base `Widget` class defines the widget rendering pipeline while allowing concrete implementations to customize specific steps:
-
-```cpp
-class Widget {
-public:
-    virtual void render() = 0;           // Pure virtual - must implement
-    virtual void update_layout(...);     // Template method
-protected:
-    virtual void apply_styles();         // Hook for customization
-    virtual void setup_yoga_layout();    // Hook for layout setup
-};
-```
-
-#### 2. **Composite Pattern**
-The `ContainerWidget` class implements the Composite pattern, allowing widgets to be organized in tree structures:
-
-```cpp
-class ContainerWidget : public Widget {
-    std::vector<std::unique_ptr<Widget>> children_;
-public:
-    void add_child(std::unique_ptr<Widget> child);
-    void remove_child(const std::string& id);
-    Widget* find_child(const std::string& id);
-};
-```
-
-#### 3. **Strategy Pattern**
-The XML parser uses different strategies for parsing different element types:
-
-```cpp
-class ElementParsingStrategy {
-public:
-    virtual std::unique_ptr<Widget> parse(void* xml_element, ...) = 0;
-};
-
-class LabelParsingStrategy : public ElementParsingStrategy { ... };
-class InputParsingStrategy : public ElementParsingStrategy { ... };
-class ButtonParsingStrategy : public ElementParsingStrategy { ... };
-```
-
-#### 4. **Factory Pattern**
-The `WidgetFactory` creates widgets dynamically based on string type names:
-
-```cpp
-class WidgetFactory {
-public:
-    static std::unique_ptr<Widget> create_widget(const std::string& type, ...);
-    static std::unique_ptr<LabelWidget> create_label(...);
-    static std::unique_ptr<ButtonWidget> create_button(...);
-};
-```
-
-#### 5. **Builder Pattern**
-The `XmlParser` builds complex widget hierarchies step by step:
-
-```cpp
-class XmlParser {
-    std::unique_ptr<Panel> parse_panel_from_file(const std::string& xml_file);
-    std::unique_ptr<Widget> parse_element(void* xml_element);
-    void apply_properties_to_widget(Widget& widget, void* xml_element);
-};
-```
-
-#### 6. **Observer Pattern**
-The file watching system uses observers for hot reload functionality:
-
-```cpp
-class XmlFileObserver {
-public:
-    virtual void on_file_changed(const std::string& file_path) = 0;
-};
-
-class XmlFileWatcher {
-    std::vector<XmlFileObserver*> observers_;
-public:
-    void add_observer(XmlFileObserver* observer);
-    void notify_observers();
-};
-```
-
-#### 7. **Mediator Pattern**
-The `PanelManager` coordinates between multiple panels:
-
-```cpp
-class PanelManager {
-    std::map<std::string, std::unique_ptr<Panel>> panels_;
-public:
-    void add_panel(const std::string& name, std::unique_ptr<Panel> panel);
-    void render_all();
-    void show_panel(const std::string& name);
-};
-```
-
-#### 8. **Facade Pattern**
-The `Application` class provides a simplified interface to the complex subsystem:
-
-```cpp
-class Application : public XmlFileObserver {
-public:
-    bool initialize();
-    void run();
-    void shutdown();
-private:
-    // Encapsulates SDL, ImGui, XML parsing, panel management
-};
-```
-
-## 🏛️ Class Hierarchy
-
-### Widget Hierarchy
-```
-Widget (abstract base)
-├── ContainerWidget (abstract)
-│   ├── HLayoutWidget (horizontal layout)
-│   └── VLayoutWidget (vertical layout)
-├── LabelWidget (text display)
-├── InputTextWidget (text input)
-├── InputNumberWidget (numeric input)
-├── CheckboxWidget (boolean input)
-├── RadioButtonWidget (radio selection)
-└── ButtonWidget (clickable button)
-```
-
-### Core Components
-```
-Panel (UI window container)
-├── title, width, height properties
-├── root_widget (Widget hierarchy)
-└── rendering and layout management
-
-PanelManager (Singleton)
-├── panel collection management
-├── coordinated rendering
-└── panel lifecycle management
-
-XmlParser (Builder)
-├── strategy-based element parsing
-├── data binding system
-└── validation and error handling
-```
-
-## 🔧 Key Features
-
-### 1. **Type Safety & Encapsulation**
-- Strong typing with virtual functions
-- Private member variables with accessor methods
-- Clear public interfaces with hidden implementation details
-
-### 2. **Polymorphism**
-- Virtual functions for widget-specific behavior
-- Runtime type identification with `dynamic_cast`
-- Strategy pattern for extensible parsing
-
-### 3. **RAII & Memory Management**
-- `std::unique_ptr` for automatic memory management
-- RAII for resource cleanup (Yoga nodes, SDL resources)
-- Exception-safe resource handling
-
-### 4. **Extensibility**
-- Easy to add new widget types by inheriting from `Widget`
-- New parsing strategies can be added without modifying existing code
-- Template-based type-safe widget lookup
-
-### 5. **Data Binding System**
-```cpp
-// Type-safe binding methods
-void bind_value(std::string* value);        // For text inputs
-void bind_value(bool* value);               // For checkboxes
-void bind_float_value(float* value);        // For numeric inputs
-void bind_selected(int* selected);          // For radio buttons
-```
-
-### 6. **Hot Reload Support**
-- Observer pattern for file change notifications
-- Automatic panel reconstruction on XML changes
-- State preservation during reloads
-
-## 🆚 OOP vs Data-Oriented Comparison
-
-| Aspect | OOP Approach (This Project) | Data-Oriented Approach (panelWidgets) |
-|--------|---------------------------|--------------------------------------|
-| **Structure** | Class hierarchies with inheritance | Structs and free functions |
-| **Memory Layout** | Objects scattered in memory | Potentially better cache locality |
-| **Extensibility** | Inheritance and virtual functions | Function pointers and composition |
-| **Type Safety** | Strong compile-time checking | Manual type management |
-| **Performance** | Virtual function call overhead | Direct function calls |
-| **Maintainability** | Clear abstractions and interfaces | Simpler, more direct code |
-| **Complexity** | Higher cognitive overhead | Lower conceptual complexity |
-
-## 🚀 Getting Started
-
-### Prerequisites
-- C++20 compatible compiler
-- SDL2 development libraries
-- CMake 3.20 or higher
-
-### Building the Project
-
-1. **Clone dependencies:**
-   ```bash
-   ./setup.sh
+## Using the Builder Pattern
+1. Pick a layout container (`HLayoutBuilder` or `VLayoutBuilder`) and chain style setters such as `.gap(10.0f)` or `.justify("space-between")`.
+2. Add children by nesting other builders. Example:
+   ```cpp
+   HLayoutBuilder row("row_0");
+   row.justify("space-between")
+      .add_child(InputTextBuilder("city_0", &city.name).flex(2.0f))
+      .add_child(InputNumberBuilder("lat_0").bind_float(&city.latitude).flex(1.0f));
    ```
+3. Build the widget tree (`row.build()`) and assign it as the panel root (`Panel::set_root_widget`). The base `WidgetBuilderBase` handles Yoga recalculation on build.
+4. Use `.on_click(std::function<...>)` to attach callbacks or `.bind_*` helpers to connect fields from `AppData`.
 
-2. **Build:**
-   ```bash
-   mkdir build && cd build
-   cmake ..
-   make
-   ```
+## Yoga Reflow During Resize
+- `Panel::render` captures `ImGui::GetContentRegionAvail()` on every frame and re-runs `update_layout`. This feeds Yoga the latest available width and height so rows stretch or wrap when the window size changes.
+- Input widgets ask Yoga for their computed width (`YGNodeLayoutGetWidth`) when rendering, which is why table columns stay proportional even if you drag-resize the window.
+- `PanelManager::update_all_layouts()` can be invoked to force a recalculation after you mutate bindings (for example when resetting data).
 
-3. **Run:**
-   ```bash
-   ./imgui_oop_app
-   ```
+## DPI Scaling Workflows
+- The builder demo adds a “Toggle DPI” button that cycles through 100%, 150%, and 200% scales. The callback updates `ImGuiIO::FontGlobalScale`, reapplies the base ImGui style with `ScaleAllSizes`, and calls `PanelManager::set_all_dpi_scale`.
+- Every `Panel` tracks its baseline width/height and recomputes Yoga layouts when `set_dpi_scale` runs. This mirrors the way operating systems increase logical pixels on a high-DPI monitor.
+- SDL emits `SDL_WINDOWEVENT_DISPLAY_CHANGED` when you drag the window between monitors. We sample `SDL_GetDisplayDPI`, derive a scale from the reported DPI, and coerce Yoga to recalculate—so the same pipeline handles both simulated and real DPI transitions.
 
-### Project Structure
+## XML-Driven Panels and Callback Lookups
+- The XML variant still lives in `city_data_panel.xml`. A trimmed excerpt:
+  ```xml
+  <hlayout id="row_0" justify="space-between" gap="10">
+      <input id="city_0" type="text" bind="city_name_0" flex="2"/>
+      <input id="lat_0" type="number" bind="city_lat_0" flex="1"/>
+      <vlayout id="climate_0" flex="1" gap="2">
+          <radio id="radio_0_0" text="Temperate" group="climate_0" value="3" bind="city_climate_0"/>
+      </vlayout>
+  </hlayout>
+  ```
+- `XmlParser::parse_element` dispatches by tag name using strategy objects. Each element becomes the corresponding widget from `WidgetFactory`, and shared Yoga attributes (`flex`, `gap`, `justify`) are copied into the `Widget::Style` struct before `setup_yoga_layout()` is called.
+- Button callbacks are resolved by id: when the XML parser hits a `<button id="save_cities"/>`, it looks up `button_callbacks_["save_cities"]` and installs the functor. That mirrors how the builder version wires callbacks inline.
+- Yoga behaves identically because the XML parser and the builder both populate the same widget types. Whether that node came from XML or C++ code, Yoga receives the same flex settings and recalculates when the panel updates.
+
+## Building and Running
+```bash
+cmake -S . -B build
+cmake --build build --target imgui_builder
+cmake --build build --target imgui_oop_app
 ```
-imguiXmlOop/
-├── Widget.h/cpp           # Base widget classes and hierarchy
-├── Panel.h/cpp            # Panel management and rendering
-├── XmlParser.h/cpp        # XML parsing with strategy pattern
-├── main.cpp               # Application facade and entry point
-├── contact_panel.xml      # Contact form definition
-├── city_data_panel.xml    # Data grid definition
-├── CMakeLists.txt         # Build configuration
-├── setup.sh               # Dependency setup script
-└── thirdparty/            # External dependencies
-    ├── imgui/
-    ├── yoga/
-    └── tinyxml2/
-```
-
-## 🎨 Usage Examples
-
-### Creating Widgets Programmatically
-```cpp
-// Using factory pattern
-auto label = WidgetFactory::create_label("header", "Welcome");
-auto input = WidgetFactory::create_input_text("name_input", &app_data.name);
-
-// Creating layouts
-auto layout = WidgetFactory::create_vlayout("main_layout");
-layout->add_child(std::move(label));
-layout->add_child(std::move(input));
-```
-
-### Panel Management
-```cpp
-// Create and register panels
-auto panel = std::make_unique<Panel>("My Panel", 400, 300);
-panel->set_root_widget(std::move(layout));
-PanelManager::instance().add_panel("my_panel", std::move(panel));
-
-// Show/hide panels
-PanelManager::instance().show_panel("my_panel");
-PanelManager::instance().render_all();
-```
-
-### XML-Driven UI
-```xml
-<panel title="Contact Form" width="450" height="400">
-    <vlayout id="main_layout" padding="16" gap="12">
-        <label id="header" text="Contact Information" font-size="large"/>
-        <input id="name_input" bind="name" flex="1"/>
-        <button id="save_btn" text="Save" variant="primary"/>
-    </vlayout>
-</panel>
-```
-
-### Data Binding
-```cpp
-// Automatic binding via XML attributes
-<input id="name" bind="name"/>           <!-- binds to app_data.name -->
-<checkbox id="python" bind="python"/>    <!-- binds to app_data.python_selected -->
-<input id="lat" type="number" bind="city_lat_0"/>  <!-- binds to app_data.cities[0].latitude -->
-```
-
-## 🔍 Advanced Features
-
-### Type-Safe Widget Lookup
-```cpp
-// Find widgets with type safety
-auto* input = panel.find_widget_as<InputTextWidget>("name_input");
-if (input) {
-    input->set_text("Default Value");
-}
-```
-
-### Custom Widget Creation
-```cpp
-class CustomWidget : public Widget {
-public:
-    CustomWidget(const std::string& id) : Widget(id) {}
-    
-    void render() override {
-        // Custom rendering logic
-        ImGui::Text("Custom Widget: %s", get_id().c_str());
-    }
-};
-
-// Register with factory
-// (Would need factory extension for full integration)
-```
-
-### Event Handling
-```cpp
-// Button callbacks with lambda capture
-parser->add_button_callback("save_button", [&app_data]() {
-    std::cout << "Saving: " << app_data.name << std::endl;
-    // Custom save logic here
-});
-```
-
-## 🎯 Benefits of OOP Approach
-
-### 1. **Clear Abstractions**
-- Each widget type has a well-defined interface
-- Behavior is encapsulated within appropriate classes
-- Complex systems are broken down into manageable components
-
-### 2. **Code Reusability**
-- Base classes provide common functionality
-- Derived classes can override specific behaviors
-- Polymorphism enables generic algorithms
-
-### 3. **Maintainability**
-- Changes to widget behavior are localized to specific classes
-- Interface contracts ensure consistent behavior
-- Testing can be done at the class level
-
-### 4. **Extensibility**
-- New widget types can be added by inheritance
-- Existing code doesn't need modification
-- Plugin-like architecture is possible
-
-### 5. **Type Safety**
-- Compile-time checking prevents many runtime errors
-- Template-based helpers provide additional safety
-- RAII ensures proper resource management
-
-## ⚠️ Trade-offs & Considerations
-
-### Performance Implications
-- **Virtual function overhead**: Each widget method call goes through vtable
-- **Memory fragmentation**: Objects may be scattered in memory
-- **Cache efficiency**: Potentially worse cache locality compared to DoP
-
-### Complexity Considerations
-- **Learning curve**: Requires understanding of multiple design patterns
-- **Cognitive overhead**: More abstractions to understand
-- **Debugging complexity**: Call stacks may be deeper
-
-### When to Use OOP Approach
-- ✅ Complex UI with many different widget types
-- ✅ Need for extensive customization and extension
-- ✅ Large development teams requiring clear interfaces
-- ✅ Long-term maintainability is priority
-- ✅ Type safety is critical
-
-### When to Consider Alternatives
-- ❌ Performance is the absolute priority
-- ❌ Simple UIs with few widget types
-- ❌ Memory usage must be minimized
-- ❌ Development team prefers simpler approaches
-
-## 🔄 Comparison with Data-Oriented Design
-
-The sister project `panelWidgets` implements the same functionality using Data-Oriented Programming principles. Key differences:
-
-### OOP Strengths
-- Better abstraction and encapsulation
-- Easier to extend with new widget types
-- Type-safe interfaces and error checking
-- Clear ownership and lifecycle management
-
-### DoP Strengths (from sister project)
-- Better cache efficiency and performance
-- Simpler mental model and debugging
-- More direct control over memory layout
-- Potentially faster compilation times
-
-Both approaches have their merits, and the choice depends on your specific requirements, team preferences, and project constraints.
-
-## 📝 License
-
-This project is provided as an educational example demonstrating object-oriented programming principles in GUI development.
-
-## 🤝 Contributing
-
-This is an educational project, but contributions that demonstrate additional OOP patterns or improve the existing implementation are welcome!
-
----
-
-*This project demonstrates the power and flexibility of object-oriented design in creating maintainable, extensible UI frameworks while acknowledging the trade-offs involved in different programming paradigms.*
+- Run `./build/imgui_builder` to explore the builder workflow, toggle DPI, and confirm Yoga reflow.
+- Run `./build/imgui_oop_app` to validate the XML pipeline, hot reload, and shared Yoga behavior.
