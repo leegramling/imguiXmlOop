@@ -38,6 +38,7 @@ Widget::~Widget() {
 
 void Widget::update_layout(float available_width, float available_height) {
     if (yoga_node_) {
+        apply_styles();
         YGNodeCalculateLayout(yoga_node_, available_width, available_height, YGDirectionLTR);
     }
 }
@@ -66,15 +67,18 @@ void Widget::set_flex(float flex) {
 void Widget::apply_styles() {
     if (!yoga_node_) return;
     
+    float scale = ImGui::GetIO().FontGlobalScale;
+    if (scale <= 0.0f) {
+        scale = 1.0f;
+    }
+
+    float margin = style_.margin * scale;
+    float padding = style_.padding * scale;
+
+    YGNodeStyleSetMargin(yoga_node_, YGEdgeAll, margin);
+    YGNodeStyleSetPadding(yoga_node_, YGEdgeAll, padding);
+    
     // Apply spacing
-    if (style_.margin > 0) {
-        YGNodeStyleSetMargin(yoga_node_, YGEdgeAll, style_.margin);
-    }
-    
-    if (style_.padding > 0) {
-        YGNodeStyleSetPadding(yoga_node_, YGEdgeAll, style_.padding);
-    }
-    
     // Apply align-self for individual items
     if (style_.align_self != "auto") {
         if (style_.align_self == "center") {
@@ -133,6 +137,19 @@ Widget* ContainerWidget::find_child(const std::string& id) {
     return (it != children_.end()) ? it->get() : nullptr;
 }
 
+void ContainerWidget::apply_styles() {
+    Widget::apply_styles();
+    if (!get_yoga_node()) {
+        return;
+    }
+
+    float scale = ImGui::GetIO().FontGlobalScale;
+    if (scale <= 0.0f) {
+        scale = 1.0f;
+    }
+    YGNodeStyleSetGap(get_yoga_node(), YGGutterAll, style_.gap * scale);
+}
+
 void ContainerWidget::update_layout(float available_width, float available_height) {
     Widget::update_layout(available_width, available_height);
     
@@ -164,7 +181,11 @@ void HLayoutWidget::setup_yoga_layout() {
     if (yoga_node_) {
         YGNodeStyleSetFlexDirection(yoga_node_, YGFlexDirectionRow);
         YGNodeStyleSetAlignItems(yoga_node_, YGAlignCenter);
-        YGNodeStyleSetGap(yoga_node_, YGGutterAll, style_.gap);
+        float scale = ImGui::GetIO().FontGlobalScale;
+        if (scale <= 0.0f) {
+            scale = 1.0f;
+        }
+        YGNodeStyleSetGap(yoga_node_, YGGutterAll, style_.gap * scale);
         
         // Apply container-specific alignment
         if (style_.justify == "center") {
@@ -211,7 +232,11 @@ void VLayoutWidget::render() {
 void VLayoutWidget::setup_yoga_layout() {
     if (yoga_node_) {
         YGNodeStyleSetFlexDirection(yoga_node_, YGFlexDirectionColumn);
-        YGNodeStyleSetGap(yoga_node_, YGGutterAll, style_.gap);
+        float scale = ImGui::GetIO().FontGlobalScale;
+        if (scale <= 0.0f) {
+            scale = 1.0f;
+        }
+        YGNodeStyleSetGap(yoga_node_, YGGutterAll, style_.gap * scale);
         
         // Apply same alignment logic as HLayout but for column direction
         if (style_.justify == "center") {
@@ -399,7 +424,8 @@ void ButtonWidget::render() {
     
     float w = YGNodeLayoutGetWidth(yoga_node_);
     float h = YGNodeLayoutGetHeight(yoga_node_);
-    ImVec2 button_size(w > 0 ? w : 80, h > 0 ? h : 0);
+    float computed_width = (w > 0.0f) ? w : 0.0f;
+    ImVec2 button_size(computed_width, h > 0 ? h : 0);
     
     if (style_.disabled) {
         ImGui::BeginDisabled();
@@ -447,7 +473,12 @@ void ButtonWidget::render() {
     }
 
     if (style_.padding > 0.0f) {
-        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(style_.padding, style_.padding * 0.75f));
+        float style_scale = ImGui::GetIO().FontGlobalScale;
+        if (style_scale <= 0.0f) {
+            style_scale = 1.0f;
+        }
+        float pad = style_.padding * style_scale;
+        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(pad, pad * 0.75f));
         style_vars_pushed++;
     }
 

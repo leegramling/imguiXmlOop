@@ -17,7 +17,11 @@ void Panel::render() {
     
     on_before_render();
     
-    ImGui::SetNextWindowSize(ImVec2(width_, height_), ImGuiCond_FirstUseEver);
+    ImGuiCond size_condition = size_dirty_ ? ImGuiCond_Always : ImGuiCond_FirstUseEver;
+    ImGui::SetNextWindowSize(ImVec2(width_, height_), size_condition);
+    if (size_dirty_) {
+        size_dirty_ = false;
+    }
     
     if (ImGui::Begin(title_.c_str(), &is_open_)) {
         ImVec2 content_size = ImGui::GetContentRegionAvail();
@@ -55,6 +59,33 @@ void Panel::update_layout() {
     }
 }
 
+void Panel::fit_to_content() {
+    if (!root_widget_ || !root_widget_->get_yoga_node()) {
+        return;
+    }
+
+    // Let Yoga compute the natural size for the layout.
+    root_widget_->update_layout(YGUndefined, YGUndefined);
+
+    float content_width = YGNodeLayoutGetWidth(root_widget_->get_yoga_node());
+    float content_height = YGNodeLayoutGetHeight(root_widget_->get_yoga_node());
+
+    if (content_width <= 0.0f) {
+        content_width = width_;
+    }
+    if (content_height <= 0.0f) {
+        content_height = height_;
+    }
+
+    const ImGuiStyle& style = ImGui::GetStyle();
+    float window_width = content_width + style.WindowPadding.x * 2.0f;
+    float window_height = content_height + style.WindowPadding.y * 2.0f;
+
+    set_width(window_width);
+    set_height(window_height);
+    update_layout();
+}
+
 void Panel::set_width(float width) {
     width_ = width;
     if (dpi_scale_ > 0.0f) {
@@ -62,6 +93,7 @@ void Panel::set_width(float width) {
     } else {
         base_width_ = width;
     }
+    size_dirty_ = true;
 }
 
 void Panel::set_height(float height) {
@@ -71,6 +103,7 @@ void Panel::set_height(float height) {
     } else {
         base_height_ = height;
     }
+    size_dirty_ = true;
 }
 
 void Panel::set_dpi_scale(float scale) {
@@ -82,6 +115,7 @@ void Panel::set_dpi_scale(float scale) {
     height_ = base_height_ * dpi_scale_;
     last_layout_width_ = -1.0f;
     last_layout_height_ = -1.0f;
+    size_dirty_ = true;
     update_layout();
 }
 
@@ -188,6 +222,14 @@ void PanelManager::set_all_dpi_scale(float scale) {
     for (auto& [name, panel] : panels_) {
         if (panel) {
             panel->set_dpi_scale(scale);
+        }
+    }
+}
+
+void PanelManager::fit_all_to_content() {
+    for (auto& [name, panel] : panels_) {
+        if (panel) {
+            panel->fit_to_content();
         }
     }
 }

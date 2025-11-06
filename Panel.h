@@ -32,6 +32,8 @@ public:
     const std::string& get_title() const { return title_; }
     void set_title(const std::string& title) { title_ = title; }
     
+    void fit_to_content();
+    
     float get_width() const { return width_; }
     void set_width(float width);
     
@@ -75,6 +77,7 @@ private:
     float last_layout_width_ = -1.0f;
     float last_layout_height_ = -1.0f;
     float last_layout_duration_ms_ = 0.0f;
+    bool size_dirty_ = true;
     bool is_open_ = true;
     std::unique_ptr<Widget> root_widget_;
     
@@ -110,6 +113,7 @@ public:
     void toggle_panel(const std::string& name);
     void set_all_dpi_scale(float scale);
     std::pair<float, float> get_layout_durations();
+    void fit_all_to_content();
     
     const std::map<std::string, std::unique_ptr<Panel>>& get_panels() const { return panels_; }
     

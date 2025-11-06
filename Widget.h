@@ -100,6 +100,7 @@ public:
     const std::vector<std::unique_ptr<Widget>>& get_children() const { return children_; }
     
     bool accepts_children() const override { return true; }
+    void apply_styles() override;
     void update_layout(float available_width, float available_height) override;
 
 protected:

@@ -12,6 +12,40 @@
 #include <iostream>
 #include <memory>
 
+namespace {
+
+void apply_light_ui_theme(ImGuiStyle& style) {
+    ImGui::StyleColorsLight(&style);
+    style.Colors[ImGuiCol_Text] = ImVec4(0.10f, 0.10f, 0.10f, 1.0f);
+    style.Colors[ImGuiCol_WindowBg] = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+    style.Colors[ImGuiCol_ChildBg] = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+    style.Colors[ImGuiCol_PopupBg] = ImVec4(1.0f, 1.0f, 1.0f, 0.98f);
+    style.Colors[ImGuiCol_MenuBarBg] = ImVec4(0.95f, 0.96f, 0.99f, 1.0f);
+    style.Colors[ImGuiCol_TitleBg] = ImVec4(0.90f, 0.93f, 0.98f, 1.0f);
+    style.Colors[ImGuiCol_TitleBgActive] = ImVec4(0.88f, 0.92f, 0.97f, 1.0f);
+    style.Colors[ImGuiCol_Header] = ImVec4(0.82f, 0.88f, 0.97f, 1.0f);
+    style.Colors[ImGuiCol_HeaderHovered] = ImVec4(0.76f, 0.84f, 0.96f, 1.0f);
+    style.Colors[ImGuiCol_HeaderActive] = ImVec4(0.70f, 0.78f, 0.94f, 1.0f);
+    style.Colors[ImGuiCol_FrameBg] = ImVec4(0.93f, 0.96f, 0.99f, 1.0f);
+    style.Colors[ImGuiCol_FrameBgHovered] = ImVec4(0.84f, 0.90f, 0.98f, 1.0f);
+    style.Colors[ImGuiCol_FrameBgActive] = ImVec4(0.78f, 0.86f, 0.96f, 1.0f);
+    style.Colors[ImGuiCol_Button] = ImVec4(0.82f, 0.88f, 0.97f, 1.0f);
+    style.Colors[ImGuiCol_ButtonHovered] = ImVec4(0.76f, 0.84f, 0.96f, 1.0f);
+    style.Colors[ImGuiCol_ButtonActive] = ImVec4(0.70f, 0.78f, 0.94f, 1.0f);
+    style.Colors[ImGuiCol_Border] = ImVec4(0.80f, 0.80f, 0.80f, 1.0f);
+    style.Colors[ImGuiCol_Separator] = style.Colors[ImGuiCol_Border];
+    style.Colors[ImGuiCol_SeparatorHovered] = ImVec4(0.60f, 0.60f, 0.95f, 1.0f);
+    style.Colors[ImGuiCol_SeparatorActive] = ImVec4(0.40f, 0.40f, 0.90f, 1.0f);
+    style.Colors[ImGuiCol_TableHeaderBg] = ImVec4(0.90f, 0.94f, 0.99f, 1.0f);
+    style.Colors[ImGuiCol_TableBorderStrong] = ImVec4(0.75f, 0.80f, 0.90f, 1.0f);
+    style.Colors[ImGuiCol_TableBorderLight] = ImVec4(0.85f, 0.88f, 0.95f, 1.0f);
+    style.GrabRounding = 6.0f;
+    style.FrameRounding = 4.0f;
+    style.WindowRounding = 6.0f;
+}
+
+} // namespace
+
 class BuilderApplication {
 public:
     bool initialize();
@@ -65,8 +99,9 @@ bool BuilderApplication::initialize() {
     ImGuiIO& io = ImGui::GetIO();
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 
-    ImGui::StyleColorsDark();
-    base_style_ = ImGui::GetStyle();
+    ImGuiStyle& style = ImGui::GetStyle();
+    apply_light_ui_theme(style);
+    base_style_ = style;
 
     if (!ImGui_ImplSDL2_InitForSDLRenderer(window_, renderer_)) {
         std::cerr << "ImGui_ImplSDL2_InitForSDLRenderer failed" << std::endl;
@@ -119,7 +154,7 @@ void BuilderApplication::run() {
         }
 
         ImGui::Render();
-        SDL_SetRenderDrawColor(renderer_, 0, 0, 0, 255);
+        SDL_SetRenderDrawColor(renderer_, 255, 255, 255, 255);
         SDL_RenderClear(renderer_);
         ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), renderer_);
         SDL_RenderPresent(renderer_);

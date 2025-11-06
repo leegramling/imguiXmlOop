@@ -48,8 +48,6 @@ std::unique_ptr<Panel> CityDataPanelBuilder::build() {
     root.padding(10.0f).gap(15.0f);
 
     root.add_child(build_title_section());
-    root.add_child(build_header_row());
-
     std::size_t row_count = std::min(max_rows_, data_.cities.size());
     for (std::size_t i = 0; i < row_count; ++i) {
         root.add_child(build_city_row(i, data_.cities[i]));
@@ -70,31 +68,6 @@ void CityDataPanelBuilder::ensure_minimum_city_entries(std::size_t count) {
     while (data_.cities.size() < count) {
         data_.cities.emplace_back();
     }
-}
-
-std::unique_ptr<Widget> CityDataPanelBuilder::build_header_row() {
-    HLayoutBuilder header("header_row");
-    header.justify("space-between").align("center").gap(10.0f);
-
-    auto header_cell = [](const std::string& id, const std::string& text, float flex) {
-        return ButtonBuilder(id, text)
-            .variant("header")
-            .text_color("white")
-            .font_size("large")
-            .bold(true)
-            .padding(12.0f)
-            .flex(flex)
-            .build();
-    };
-
-    header.add_child(header_cell("header_city", "City", 2.0f));
-    header.add_child(header_cell("header_lat", "Lat", 1.0f));
-    header.add_child(header_cell("header_lon", "Lon", 1.0f));
-    header.add_child(header_cell("header_elev", "Elev (m)", 1.0f));
-    header.add_child(header_cell("header_temp", "Avg °C", 1.0f));
-    header.add_child(header_cell("header_climate", "Climate", 1.0f));
-
-    return header.build();
 }
 
 std::unique_ptr<Widget> CityDataPanelBuilder::build_title_section() {
