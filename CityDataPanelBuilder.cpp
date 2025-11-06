@@ -76,12 +76,23 @@ std::unique_ptr<Widget> CityDataPanelBuilder::build_header_row() {
     HLayoutBuilder header("header_row");
     header.justify("space-between").align("center").gap(10.0f);
 
-    header.add_child(LabelBuilder("header_city", "City").flex(2.0f).font_size("large").bold(true));
-    header.add_child(LabelBuilder("header_lat", "Latitude").flex(1.0f).font_size("large").bold(true));
-    header.add_child(LabelBuilder("header_lon", "Longitude").flex(1.0f).font_size("large").bold(true));
-    header.add_child(LabelBuilder("header_elev", "Elevation (m)").flex(1.0f).font_size("large").bold(true));
-    header.add_child(LabelBuilder("header_temp", "Avg Temp (°C)").flex(1.0f).font_size("large").bold(true));
-    header.add_child(LabelBuilder("header_climate", "Climate").flex(1.0f).font_size("large").bold(true));
+    auto header_cell = [](const std::string& id, const std::string& text, float flex) {
+        return ButtonBuilder(id, text)
+            .variant("header")
+            .text_color("white")
+            .font_size("large")
+            .bold(true)
+            .padding(8.0f)
+            .flex(flex)
+            .build();
+    };
+
+    header.add_child(header_cell("header_city", "City", 2.0f));
+    header.add_child(header_cell("header_lat", "Lat", 1.0f));
+    header.add_child(header_cell("header_lon", "Lon", 1.0f));
+    header.add_child(header_cell("header_elev", "Elev (m)", 1.0f));
+    header.add_child(header_cell("header_temp", "Avg °C", 1.0f));
+    header.add_child(header_cell("header_climate", "Climate", 1.0f));
 
     return header.build();
 }

@@ -69,6 +69,8 @@ private:
     float base_width_;
     float base_height_;
     float dpi_scale_ = 1.0f;
+    float last_layout_width_ = -1.0f;
+    float last_layout_height_ = -1.0f;
     bool is_open_ = true;
     std::unique_ptr<Widget> root_widget_;
     

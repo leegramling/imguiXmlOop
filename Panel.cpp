@@ -1,5 +1,6 @@
 #include "Panel.h"
 #include "imgui.h"
+#include <cmath>
 #include <iostream>
 
 // ============================================================================
@@ -20,8 +21,14 @@ void Panel::render() {
         ImVec2 content_size = ImGui::GetContentRegionAvail();
         
         if (root_widget_) {
-            // Update layout based on available content size
-            root_widget_->update_layout(content_size.x, content_size.y);
+            // Update layout only if the available size changed
+            constexpr float kEpsilon = 0.5f;
+            if (std::abs(last_layout_width_ - content_size.x) > kEpsilon ||
+                std::abs(last_layout_height_ - content_size.y) > kEpsilon) {
+                last_layout_width_ = content_size.x;
+                last_layout_height_ = content_size.y;
+                root_widget_->update_layout(content_size.x, content_size.y);
+            }
             
             // Render the widget tree
             root_widget_->render();
@@ -35,6 +42,8 @@ void Panel::render() {
 void Panel::update_layout() {
     if (root_widget_) {
         root_widget_->update_layout(width_, height_);
+        last_layout_width_ = width_;
+        last_layout_height_ = height_;
     }
 }
 
@@ -63,11 +72,15 @@ void Panel::set_dpi_scale(float scale) {
     dpi_scale_ = scale;
     width_ = base_width_ * dpi_scale_;
     height_ = base_height_ * dpi_scale_;
+    last_layout_width_ = -1.0f;
+    last_layout_height_ = -1.0f;
     update_layout();
 }
 
 void Panel::set_root_widget(std::unique_ptr<Widget> root) {
     root_widget_ = std::move(root);
+    last_layout_width_ = -1.0f;
+    last_layout_height_ = -1.0f;
     update_layout();
 }
 

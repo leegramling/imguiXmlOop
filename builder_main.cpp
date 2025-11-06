@@ -46,8 +46,8 @@ bool BuilderApplication::initialize() {
     window_ = SDL_CreateWindow("ImGui Builder Demo",
                                SDL_WINDOWPOS_CENTERED,
                                SDL_WINDOWPOS_CENTERED,
-                               1000,
-                               700,
+                               1400,
+                               900,
                                window_flags);
     if (!window_) {
         std::cerr << "SDL_CreateWindow failed: " << SDL_GetError() << std::endl;
@@ -161,7 +161,7 @@ void BuilderApplication::initialize_app_data() {
 std::unique_ptr<Panel> BuilderApplication::build_city_panel() {
 CityDataPanelBuilder builder(app_data_);
     builder.with_title("City Data Grid")
-        .with_size(900.0f, 600.0f)
+        .with_size(1100.0f, 680.0f)
         .with_max_rows(6)
         .on_save([this]() {
             std::cout << "City data saved:" << std::endl;

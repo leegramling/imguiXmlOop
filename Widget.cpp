@@ -3,6 +3,24 @@
 #include <algorithm>
 #include <cstring>
 #include <string>
+#include <cmath>
+
+namespace {
+
+ImVec4 color_from_name(const std::string& name, const ImVec4& fallback = ImVec4(1.0f, 1.0f, 1.0f, 1.0f)) {
+    if (name == "red") return ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
+    if (name == "green") return ImVec4(0.0f, 1.0f, 0.0f, 1.0f);
+    if (name == "blue") return ImVec4(0.0f, 0.0f, 1.0f, 1.0f);
+    if (name == "yellow") return ImVec4(1.0f, 1.0f, 0.0f, 1.0f);
+    if (name == "gray") return ImVec4(0.5f, 0.5f, 0.5f, 1.0f);
+    if (name == "white") return ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+    if (name == "black") return ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
+    if (name == "header_bg") return ImVec4(0.16f, 0.35f, 0.60f, 1.0f);
+    if (name == "header_text") return ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+    return fallback;
+}
+
+} // namespace
 
 // ============================================================================
 // Base Widget Implementation
@@ -239,36 +257,23 @@ void LabelWidget::render() {
     apply_styles();
     
     // Apply ImGui font scaling based on style
+    float font_scale = 1.0f;
     if (style_.font_size == "small") {
-        ImGui::SetWindowFontScale(0.8f);
+        font_scale = 0.9f;
     } else if (style_.font_size == "large") {
-        ImGui::SetWindowFontScale(1.2f);
-    } else {
-        ImGui::SetWindowFontScale(1.0f);
+        font_scale = 1.2f;
     }
+    if (style_.bold) {
+        font_scale += 0.1f;
+    }
+    ImGui::SetWindowFontScale(font_scale);
     
     // Apply text color
-    ImVec4 text_color = ImVec4(1.0f, 1.0f, 1.0f, 1.0f); // default white
-    if (style_.text_color == "red") {
-        text_color = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
-    } else if (style_.text_color == "green") {
-        text_color = ImVec4(0.0f, 1.0f, 0.0f, 1.0f);
-    } else if (style_.text_color == "blue") {
-        text_color = ImVec4(0.0f, 0.0f, 1.0f, 1.0f);
-    } else if (style_.text_color == "yellow") {
-        text_color = ImVec4(1.0f, 1.0f, 0.0f, 1.0f);
-    } else if (style_.text_color == "gray") {
-        text_color = ImVec4(0.5f, 0.5f, 0.5f, 1.0f);
-    }
+    ImVec4 text_color = color_from_name(style_.text_color, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
     
     ImGui::PushStyleColor(ImGuiCol_Text, text_color);
     
-    if (style_.bold) {
-        // Bold text approximation
-        ImGui::Text("%s", text_.c_str());
-        ImGui::SameLine(0, 0);
-    }
-    ImGui::Text("%s", text_.c_str());
+    ImGui::TextUnformatted(text_.c_str());
     
     ImGui::PopStyleColor();
     
@@ -402,14 +407,56 @@ void ButtonWidget::render() {
     
     // Apply button variant styling
     int colors_pushed = 0;
+    int text_color_pushed = 0;
+    ImGuiStyle& imgui_style = ImGui::GetStyle();
+    ImVec4 effective_text_color = imgui_style.Colors[ImGuiCol_Text];
+    if (style_.text_color != "default") {
+        effective_text_color = color_from_name(style_.text_color, effective_text_color);
+    }
     if (style_.variant == "primary") {
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.5f, 1.0f, 1.0f));
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.0f, 0.6f, 1.0f, 1.0f));
-        colors_pushed = 2;
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.0f, 0.45f, 0.9f, 1.0f));
+        colors_pushed = 3;
     } else if (style_.variant == "danger") {
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.2f, 0.2f, 1.0f));
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.9f, 0.3f, 0.3f, 1.0f));
-        colors_pushed = 2;
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.7f, 0.15f, 0.15f, 1.0f));
+        colors_pushed = 3;
+    } else if (style_.variant == "header") {
+        ImVec4 header_color = color_from_name("header_bg", ImVec4(0.16f, 0.35f, 0.60f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_Button, header_color);
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, header_color);
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, header_color);
+        colors_pushed = 3;
+        if (style_.text_color == "default") {
+            effective_text_color = color_from_name("header_text", ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+        }
+    }
+
+    if (style_.variant == "header" || style_.text_color != "default") {
+        ImGui::PushStyleColor(ImGuiCol_Text, effective_text_color);
+        text_color_pushed++;
+    }
+
+    bool padding_pushed = false;
+    if (style_.padding > 0.0f) {
+        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(style_.padding, style_.padding * 0.75f));
+        padding_pushed = true;
+    }
+
+    float font_scale = 1.0f;
+    if (style_.font_size == "small") {
+        font_scale = 0.9f;
+    } else if (style_.font_size == "large") {
+        font_scale = 1.1f;
+    }
+    if (style_.bold) {
+        font_scale += 0.1f;
+    }
+    bool font_scaled = std::abs(font_scale - 1.0f) > 0.01f;
+    if (font_scaled) {
+        ImGui::SetWindowFontScale(font_scale);
     }
     
     std::string label = text_;
@@ -422,6 +469,18 @@ void ButtonWidget::render() {
         }
     }
     
+    if (font_scaled) {
+        ImGui::SetWindowFontScale(1.0f);
+    }
+
+    if (padding_pushed) {
+        ImGui::PopStyleVar();
+    }
+
+    if (text_color_pushed > 0) {
+        ImGui::PopStyleColor(text_color_pushed);
+    }
+
     if (colors_pushed > 0) {
         ImGui::PopStyleColor(colors_pushed);
     }
