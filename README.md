@@ -66,5 +66,5 @@ cmake -S . -B build
 cmake --build build --target imgui_builder
 cmake --build build --target imgui_oop_app
 ```
-- Run `./build/imgui_builder` to explore the builder workflow, toggle DPI, and confirm Yoga reflow. The main menu bar shows the most recent Yoga solve time in milliseconds so you can spot expensive layout paths.
+- Run `./build/imgui_builder` to explore the builder workflow, toggle DPI, and confirm Yoga reflow. The main menu bar shows the latest and peak Yoga solve times (ms) so you can spot expensive or spiky layout paths.
 - Run `./build/imgui_oop_app` to validate the XML pipeline, hot reload, and shared Yoga behavior.

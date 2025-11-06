@@ -3,6 +3,7 @@
 #include <string>
 #include <memory>
 #include <map>
+#include <utility>
 
 /**
  * @brief Represents a complete UI panel that can be rendered as a window
@@ -108,11 +109,12 @@ public:
     void hide_panel(const std::string& name);
     void toggle_panel(const std::string& name);
     void set_all_dpi_scale(float scale);
-    float get_max_layout_duration_ms() const;
+    std::pair<float, float> get_layout_durations();
     
     const std::map<std::string, std::unique_ptr<Panel>>& get_panels() const { return panels_; }
     
 private:
     PanelManager() = default;
     std::map<std::string, std::unique_ptr<Panel>> panels_;
+    float peak_layout_duration_ms_ = 0.0f;
 };

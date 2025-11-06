@@ -203,18 +203,18 @@ void BuilderApplication::render_menu_bar() {
             ImGui::EndMenu();
         }
 
-        float yoga_ms = PanelManager::instance().get_max_layout_duration_ms();
+        auto [yoga_ms, yoga_peak_ms] = PanelManager::instance().get_layout_durations();
         ImVec2 region_max = ImGui::GetWindowContentRegionMax();
         ImVec2 region_min = ImGui::GetWindowContentRegionMin();
         float region_width = region_max.x - region_min.x;
-        float text_width = ImGui::CalcTextSize("Yoga Δ 000.000 ms").x;
+        float text_width = ImGui::CalcTextSize("Yoga Δ 000.000 ms | peak 000.000 ms").x;
         float cursor_x = region_min.x + region_width - text_width - 10.0f;
         if (cursor_x > ImGui::GetCursorPosX()) {
             ImGui::SameLine(cursor_x);
         } else {
             ImGui::SameLine();
         }
-        ImGui::Text("Yoga Δ %.3f ms", yoga_ms);
+        ImGui::Text("Yoga Δ %.3f ms | peak %.3f ms", yoga_ms, yoga_peak_ms);
         ImGui::EndMainMenuBar();
     }
 }

@@ -408,6 +408,9 @@ void ButtonWidget::render() {
     // Apply button variant styling
     int colors_pushed = 0;
     int text_color_pushed = 0;
+    int style_vars_pushed = 0;
+    int border_color_pushed = 0;
+
     ImGuiStyle& imgui_style = ImGui::GetStyle();
     ImVec4 effective_text_color = imgui_style.Colors[ImGuiCol_Text];
     if (style_.text_color != "default") {
@@ -432,6 +435,10 @@ void ButtonWidget::render() {
         if (style_.text_color == "default") {
             effective_text_color = color_from_name("header_text", ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
         }
+        ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(1.0f, 1.0f, 1.0f, 0.35f));
+        border_color_pushed = 1;
+        ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.0f);
+        style_vars_pushed++;
     }
 
     if (style_.variant == "header" || style_.text_color != "default") {
@@ -439,10 +446,9 @@ void ButtonWidget::render() {
         text_color_pushed++;
     }
 
-    bool padding_pushed = false;
     if (style_.padding > 0.0f) {
         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(style_.padding, style_.padding * 0.75f));
-        padding_pushed = true;
+        style_vars_pushed++;
     }
 
     float font_scale = 1.0f;
@@ -473,12 +479,16 @@ void ButtonWidget::render() {
         ImGui::SetWindowFontScale(1.0f);
     }
 
-    if (padding_pushed) {
+    while (style_vars_pushed-- > 0) {
         ImGui::PopStyleVar();
     }
 
     if (text_color_pushed > 0) {
         ImGui::PopStyleColor(text_color_pushed);
+    }
+
+    if (border_color_pushed > 0) {
+        ImGui::PopStyleColor(border_color_pushed);
     }
 
     if (colors_pushed > 0) {

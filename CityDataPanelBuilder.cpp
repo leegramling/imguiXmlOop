@@ -82,7 +82,7 @@ std::unique_ptr<Widget> CityDataPanelBuilder::build_header_row() {
             .text_color("white")
             .font_size("large")
             .bold(true)
-            .padding(8.0f)
+            .padding(12.0f)
             .flex(flex)
             .build();
     };

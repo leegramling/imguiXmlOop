@@ -192,12 +192,13 @@ void PanelManager::set_all_dpi_scale(float scale) {
     }
 }
 
-float PanelManager::get_max_layout_duration_ms() const {
-    float max_duration = 0.0f;
+std::pair<float, float> PanelManager::get_layout_durations() {
+    float current_max = 0.0f;
     for (const auto& [name, panel] : panels_) {
         if (panel) {
-            max_duration = std::max(max_duration, panel->get_last_layout_duration_ms());
+            current_max = std::max(current_max, panel->get_last_layout_duration_ms());
         }
     }
-    return max_duration;
+    peak_layout_duration_ms_ = std::max(peak_layout_duration_ms_, current_max);
+    return {current_max, peak_layout_duration_ms_};
 }
