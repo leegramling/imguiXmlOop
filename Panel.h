@@ -45,6 +45,8 @@ public:
 
     float get_dpi_scale() const { return dpi_scale_; }
     void set_dpi_scale(float scale);
+
+    float get_last_layout_duration_ms() const { return last_layout_duration_ms_; }
     
     // Widget management
     void set_root_widget(std::unique_ptr<Widget> root);
@@ -71,6 +73,7 @@ private:
     float dpi_scale_ = 1.0f;
     float last_layout_width_ = -1.0f;
     float last_layout_height_ = -1.0f;
+    float last_layout_duration_ms_ = 0.0f;
     bool is_open_ = true;
     std::unique_ptr<Widget> root_widget_;
     
@@ -105,6 +108,7 @@ public:
     void hide_panel(const std::string& name);
     void toggle_panel(const std::string& name);
     void set_all_dpi_scale(float scale);
+    float get_max_layout_duration_ms() const;
     
     const std::map<std::string, std::unique_ptr<Panel>>& get_panels() const { return panels_; }
     

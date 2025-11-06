@@ -1,6 +1,8 @@
 #include "Panel.h"
 #include "imgui.h"
+#include <algorithm>
 #include <cmath>
+#include <chrono>
 #include <iostream>
 
 // ============================================================================
@@ -27,7 +29,10 @@ void Panel::render() {
                 std::abs(last_layout_height_ - content_size.y) > kEpsilon) {
                 last_layout_width_ = content_size.x;
                 last_layout_height_ = content_size.y;
+                auto start = std::chrono::high_resolution_clock::now();
                 root_widget_->update_layout(content_size.x, content_size.y);
+                auto end = std::chrono::high_resolution_clock::now();
+                last_layout_duration_ms_ = std::chrono::duration<float, std::milli>(end - start).count();
             }
             
             // Render the widget tree
@@ -41,7 +46,10 @@ void Panel::render() {
 
 void Panel::update_layout() {
     if (root_widget_) {
+        auto start = std::chrono::high_resolution_clock::now();
         root_widget_->update_layout(width_, height_);
+        auto end = std::chrono::high_resolution_clock::now();
+        last_layout_duration_ms_ = std::chrono::duration<float, std::milli>(end - start).count();
         last_layout_width_ = width_;
         last_layout_height_ = height_;
     }
@@ -182,4 +190,14 @@ void PanelManager::set_all_dpi_scale(float scale) {
             panel->set_dpi_scale(scale);
         }
     }
+}
+
+float PanelManager::get_max_layout_duration_ms() const {
+    float max_duration = 0.0f;
+    for (const auto& [name, panel] : panels_) {
+        if (panel) {
+            max_duration = std::max(max_duration, panel->get_last_layout_duration_ms());
+        }
+    }
+    return max_duration;
 }
