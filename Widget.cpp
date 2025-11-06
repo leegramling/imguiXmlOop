@@ -2,6 +2,7 @@
 #include <iostream>
 #include <algorithm>
 #include <cstring>
+#include <string>
 
 // ============================================================================
 // Base Widget Implementation
@@ -369,7 +370,11 @@ void RadioButtonWidget::render() {
     
     if (selected_) {
         bool is_selected = (*selected_ == value_);
-        if (ImGui::RadioButton(text_.c_str(), is_selected)) {
+        std::string label = text_;
+        if (!id_.empty()) {
+            label += "##" + id_;
+        }
+        if (ImGui::RadioButton(label.c_str(), is_selected)) {
             *selected_ = value_;
         }
     }
@@ -407,7 +412,11 @@ void ButtonWidget::render() {
         colors_pushed = 2;
     }
     
-    if (ImGui::Button(text_.c_str(), button_size)) {
+    std::string label = text_;
+    if (!id_.empty()) {
+        label += "##" + id_;
+    }
+    if (ImGui::Button(label.c_str(), button_size)) {
         if (callback_) {
             callback_();
         }
