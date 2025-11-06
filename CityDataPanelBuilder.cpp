@@ -47,6 +47,7 @@ std::unique_ptr<Panel> CityDataPanelBuilder::build() {
     VLayoutBuilder root("main_layout");
     root.padding(10.0f).gap(15.0f);
 
+    root.add_child(build_title_section());
     root.add_child(build_header_row());
 
     std::size_t row_count = std::min(max_rows_, data_.cities.size());
@@ -83,6 +84,15 @@ std::unique_ptr<Widget> CityDataPanelBuilder::build_header_row() {
     header.add_child(LabelBuilder("header_climate", "Climate").flex(1.0f).font_size("large").bold(true));
 
     return header.build();
+}
+
+std::unique_ptr<Widget> CityDataPanelBuilder::build_title_section() {
+    HLayoutBuilder row("title_row");
+    row.justify("center").align("center").margin(5.0f);
+
+    row.add_child(LabelBuilder("panel_title", title_).font_size("large").bold(true));
+
+    return row.build();
 }
 
 std::unique_ptr<Widget> CityDataPanelBuilder::build_city_row(std::size_t index, CityData& city) {

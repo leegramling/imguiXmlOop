@@ -35,6 +35,7 @@ private:
     std::function<void()> on_toggle_dpi_;
 
     void ensure_minimum_city_entries(std::size_t count);
+    std::unique_ptr<Widget> build_title_section();
     std::unique_ptr<Widget> build_header_row();
     std::unique_ptr<Widget> build_city_row(std::size_t index, CityData& city);
     std::unique_ptr<Widget> build_climate_column(const std::string& base_id, int* binding);
